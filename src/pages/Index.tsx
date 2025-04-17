@@ -66,8 +66,8 @@ const Index = () => {
             
             <div className="lg:w-1/2">
               <img
-                src="/placeholder.svg"
-                alt="Quiz Illustration"
+                src="https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+                alt="Student taking an online exam"
                 className="w-full max-w-lg mx-auto rounded-lg shadow-lg"
               />
             </div>

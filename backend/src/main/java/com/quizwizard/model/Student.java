@@ -21,6 +21,10 @@ public class Student {
     @Column(unique = true)
     private String email;
     
+    private String firstName;
+    
+    private String lastName;
+    
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
     private List<StudentResponse> responses;
     

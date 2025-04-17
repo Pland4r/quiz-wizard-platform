@@ -25,6 +25,13 @@ const Index = () => {
     
     navigate(`/exam/${examCode}`);
   };
+
+  const scrollToStudentSection = () => {
+    const studentSection = document.getElementById('student-section');
+    if (studentSection) {
+      studentSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
   
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -47,11 +54,13 @@ const Index = () => {
                     Teacher Login
                   </Button>
                 </Link>
-                <Link to="#student-section">
-                  <Button variant="outline" className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-quiz-primary">
-                    Take an Exam
-                  </Button>
-                </Link>
+                <Button 
+                  variant="outline" 
+                  className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-quiz-primary"
+                  onClick={scrollToStudentSection}
+                >
+                  Take an Exam
+                </Button>
               </div>
             </div>
             

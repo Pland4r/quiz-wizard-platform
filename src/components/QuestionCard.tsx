@@ -7,7 +7,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Question, StudentResponse } from "@/types";
 import { useEffect, useState } from "react";
 import { Timer } from "./Timer";
-import { AlertCircle } from "lucide-react";
 
 interface QuestionCardProps {
   question: Question;
@@ -31,7 +30,7 @@ export const QuestionCard = ({
     onAnswerSubmit({
       studentId,
       examId,
-      questionId: question?.id || "",
+      questionId: question.id!,
       answer,
     });
     setAnswer("");
@@ -43,31 +42,6 @@ export const QuestionCard = ({
       handleSubmit();
     }
   }, [timeExpired]);
-  
-  // Handle case where question is undefined
-  if (!question) {
-    return (
-      <Card className="w-full max-w-3xl mx-auto shadow-lg animate-fade-in">
-        <CardHeader className="bg-red-500 text-white rounded-t-lg">
-          <div className="flex items-center gap-2">
-            <AlertCircle size={20} />
-            <CardTitle className="text-xl">Question non disponible</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="pt-6">
-          <p>La question demandée n'existe pas ou n'a pas pu être chargée.</p>
-        </CardContent>
-        <CardFooter className="flex justify-end space-x-2 border-t p-4">
-          <Button 
-            onClick={() => window.location.reload()}
-            className="bg-quiz-secondary hover:bg-quiz-secondary/90"
-          >
-            Rafraîchir
-          </Button>
-        </CardFooter>
-      </Card>
-    );
-  }
   
   return (
     <Card className="w-full max-w-3xl mx-auto shadow-lg animate-fade-in">
@@ -106,12 +80,12 @@ export const QuestionCard = ({
             </RadioGroup>
           ) : (
             <div className="space-y-2">
-              <Label htmlFor="answer">Votre réponse</Label>
+              <Label htmlFor="answer">Your Answer</Label>
               <Input
                 id="answer"
                 value={answer}
                 onChange={(e) => setAnswer(e.target.value)}
-                placeholder="Tapez votre réponse ici..."
+                placeholder="Type your answer here..."
               />
             </div>
           )}
@@ -124,7 +98,7 @@ export const QuestionCard = ({
           disabled={!answer}
           className="bg-quiz-secondary hover:bg-quiz-secondary/90"
         >
-          {isLastQuestion ? "Terminer l'examen" : "Question suivante"}
+          {isLastQuestion ? "Finish Exam" : "Next Question"}
         </Button>
       </CardFooter>
     </Card>

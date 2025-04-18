@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { useToast } from "@/components/ui/use-toast";
-import { AlertCircle } from "lucide-react";
 
 const ExamTaking = () => {
   const { examId } = useParams<{ examId: string }>();
@@ -17,7 +16,6 @@ const ExamTaking = () => {
   const [responses, setResponses] = useState<StudentResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [examCompleted, setExamCompleted] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -26,24 +24,15 @@ const ExamTaking = () => {
     const fetchExam = async () => {
       try {
         setIsLoading(true);
-        setError(null);
         const examData = await api.exams.getByAccessLink(examId!);
-        
-        // Vérifier si l'examen a des questions
-        if (!examData.questions || examData.questions.length === 0) {
-          setError("Cet examen ne contient aucune question.");
-          setExam(null);
-        } else {
-          setExam(examData);
-        }
-      } catch (error: any) {
-        console.error("Erreur lors du chargement de l'examen:", error);
-        setError(error.message || "Examen introuvable ou non disponible");
+        setExam(examData);
+      } catch (error) {
         toast({
-          title: "Erreur",
-          description: "Examen introuvable ou non disponible",
+          title: "Error",
+          description: "Exam not found",
           variant: "destructive",
         });
+        navigate("/");
       } finally {
         setIsLoading(false);
       }
@@ -60,13 +49,12 @@ const ExamTaking = () => {
       const studentData = await api.students.register(email, exam!.id!);
       setStudent(studentData);
       setIsLoading(false);
-    } catch (error: any) {
+    } catch (error) {
       toast({
-        title: "Erreur",
-        description: "Échec de l'inscription à l'examen",
+        title: "Error",
+        description: "Failed to register for the exam",
         variant: "destructive",
       });
-      setIsLoading(false);
     }
   };
   
@@ -76,16 +64,16 @@ const ExamTaking = () => {
       setResponses([...responses, savedResponse]);
       
       if (currentQuestionIndex === exam!.questions.length - 1) {
-        // Dernière question, calculer les résultats
+        // Last question, calculate results
         await calculateResults();
       } else {
-        // Passer à la question suivante
+        // Move to next question
         setCurrentQuestionIndex(currentQuestionIndex + 1);
       }
-    } catch (error: any) {
+    } catch (error) {
       toast({
-        title: "Erreur",
-        description: "Échec de la soumission de la réponse",
+        title: "Error",
+        description: "Failed to submit answer",
         variant: "destructive",
       });
     }
@@ -96,10 +84,10 @@ const ExamTaking = () => {
       await api.results.calculate(student!.id!, exam!.id!);
       setExamCompleted(true);
       navigate(`/exam-results/${exam!.id}?studentId=${student!.id}`);
-    } catch (error: any) {
+    } catch (error) {
       toast({
-        title: "Erreur",
-        description: "Échec du calcul des résultats",
+        title: "Error",
+        description: "Failed to calculate results",
         variant: "destructive",
       });
     }
@@ -116,24 +104,19 @@ const ExamTaking = () => {
     );
   }
   
-  if (error || !exam) {
+  if (!exam) {
     return (
       <div className="min-h-screen flex flex-col bg-gray-50">
         <Navbar />
         <div className="flex-1 flex justify-center items-center">
-          <div className="text-center max-w-md p-6 bg-white rounded-lg shadow-md">
-            <div className="flex justify-center mb-4">
-              <AlertCircle className="h-16 w-16 text-red-500" />
-            </div>
-            <h1 className="text-2xl font-bold text-red-600 mb-2">Examen non disponible</h1>
-            <p className="text-gray-600 mb-4">
-              {error || "L'examen que vous recherchez n'existe pas ou a expiré."}
-            </p>
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-quiz-primary mb-2">Exam Not Found</h1>
+            <p className="text-gray-600 mb-4">The exam you're looking for doesn't exist or has expired.</p>
             <button
               onClick={() => navigate("/")}
               className="text-quiz-secondary hover:underline"
             >
-              Retour à l'accueil
+              Return to Home
             </button>
           </div>
         </div>
@@ -160,10 +143,10 @@ const ExamTaking = () => {
           <h1 className="text-3xl font-bold text-quiz-primary">{exam.name}</h1>
           <div className="flex justify-between items-center mt-2">
             <p className="text-gray-600">
-              Question {currentQuestionIndex + 1} sur {exam.questions.length}
+              Question {currentQuestionIndex + 1} of {exam.questions.length}
             </p>
             <p className="text-gray-600">
-              Étudiant: {student.email}
+              Student: {student.email}
             </p>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">

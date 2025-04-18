@@ -275,16 +275,6 @@ export const api = {
       } catch (error) {
         return null;
       }
-    },
-    
-    getByExamAndProfessor: async (examId: string, professorId: string): Promise<ExamResult[]> => {
-      try {
-        const response = await axiosInstance.get(`/results/exam/${examId}/professor/${professorId}`);
-        return response.data;
-      } catch (error) {
-        console.error("Error fetching exam results:", error);
-        throw new Error(error.response?.data || "Failed to fetch results");
-      }
     }
   }
 };

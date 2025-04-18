@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -36,25 +37,17 @@ export const ProfessorAuth = ({ onAuthSuccess }: ProfessorAuthProps) => {
     try {
       setIsLoading(true);
       const response = await api.auth.login(loginEmail, loginPassword);
-      
-      if (response && response.token && response.user) {
-        localStorage.setItem("user", JSON.stringify(response.user));
-        localStorage.setItem("token", response.token);
-        
-        toast({
-          title: "Success",
-          description: "You have successfully logged in",
-        });
-        
-        onAuthSuccess(response.token);
-      } else {
-        throw new Error("Invalid response format");
-      }
-    } catch (error: any) {
-      console.error("Login error:", error);
+      localStorage.setItem("user", JSON.stringify(response.user));
+      localStorage.setItem("token", response.token);
+      toast({
+        title: "Success",
+        description: "You have successfully logged in",
+      });
+      onAuthSuccess(response.token);
+    } catch (error) {
       toast({
         title: "Error",
-        description: error.message || "Invalid credentials",
+        description: "Invalid credentials",
         variant: "destructive",
       });
     } finally {
@@ -81,25 +74,17 @@ export const ProfessorAuth = ({ onAuthSuccess }: ProfessorAuthProps) => {
         email: registerEmail,
         password: registerPassword,
       });
-      
-      if (response && response.token && response.user) {
-        localStorage.setItem("user", JSON.stringify(response.user));
-        localStorage.setItem("token", response.token);
-        
-        toast({
-          title: "Success",
-          description: "Account created successfully",
-        });
-        
-        onAuthSuccess(response.token);
-      } else {
-        throw new Error("Invalid response format");
-      }
-    } catch (error: any) {
-      console.error("Registration error:", error);
+      localStorage.setItem("user", JSON.stringify(response.user));
+      localStorage.setItem("token", response.token);
+      toast({
+        title: "Success",
+        description: "Account created successfully",
+      });
+      onAuthSuccess(response.token);
+    } catch (error) {
       toast({
         title: "Error",
-        description: error.message || "Registration failed. Email may already be in use.",
+        description: "Registration failed. Email may already be in use.",
         variant: "destructive",
       });
     } finally {

@@ -46,12 +46,18 @@ const ViewResults = () => {
         setResults(resultsData);
         
         setError(null);
-      } catch (err) {
+      } catch (err: any) {
         console.error("Error fetching exam results:", err);
         let errorMessage = "Failed to load exam results. Please try again later.";
-        if (err.message === "Unauthorized to view these results") {
+        
+        if (err.message === "Network Error") {
+          errorMessage = "Network error: Could not connect to the server. Please check your connection or contact support.";
+        } else if (err.message === "Unauthorized to view these results") {
           errorMessage = "You are not authorized to view these results.";
+        } else if (err.message) {
+          errorMessage = err.message;
         }
+        
         setError(errorMessage);
         toast({
           title: "Error",

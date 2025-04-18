@@ -1,4 +1,3 @@
-
 package com.quizwizard.controller;
 
 import com.quizwizard.dto.LoginRequest;
@@ -17,7 +16,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/professors")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:8081", "http://localhost:8080"}, allowCredentials = "true", maxAge = 3600)
 public class ProfessorController {
 
     @Autowired

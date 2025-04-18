@@ -2,14 +2,17 @@ package com.quizwizard.controller;
 
 import com.quizwizard.dto.CalculateResultRequest;
 import com.quizwizard.dto.ExamResultDto;
+import com.quizwizard.dto.QuestionResultDto;
 import com.quizwizard.model.Exam;
 import com.quizwizard.model.ExamResult;
 import com.quizwizard.model.Student;
 import com.quizwizard.model.Professor;
+import com.quizwizard.model.StudentResponse;
 import com.quizwizard.repository.ExamRepository;
 import com.quizwizard.repository.ExamResultRepository;
 import com.quizwizard.repository.StudentRepository;
 import com.quizwizard.repository.ProfessorRepository;
+import com.quizwizard.repository.StudentResponseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +24,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/results")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:8081", "http://localhost:8080"}, allowCredentials = "true", maxAge = 3600)
 public class ExamResultController {
 
     @Autowired
@@ -35,6 +38,9 @@ public class ExamResultController {
     
     @Autowired
     private ProfessorRepository professorRepository;
+    
+    @Autowired
+    private StudentResponseRepository responseRepository;
 
     @GetMapping("/exam/{examId}/professor/{professorId}")
     public ResponseEntity<List<ExamResultDto>> getResultsByExamAndProfessor(
@@ -51,7 +57,6 @@ public class ExamResultController {
         Professor professor = professorOpt.get();
         Exam exam = examOpt.get();
         
-        // Check if the exam belongs to the professor
         if (!exam.getProfessor().getId().equals(professor.getId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
@@ -76,16 +81,13 @@ public class ExamResultController {
         Student student = studentOpt.get();
         Exam exam = examOpt.get();
         
-        // Check if result already exists
         Optional<ExamResult> existingResult = resultRepository.findByStudentAndExam(student, exam);
         if (existingResult.isPresent()) {
             return ResponseEntity.ok(convertToDto(existingResult.get()));
         }
         
-        // Get all responses for this student and exam
         List<StudentResponse> responses = responseRepository.findByStudentAndExam(student, exam);
         
-        // Calculate score
         int correctAnswers = 0;
         for (StudentResponse response : responses) {
             if (response.getIsCorrect() != null && response.getIsCorrect()) {
@@ -96,7 +98,6 @@ public class ExamResultController {
         int totalQuestions = exam.getQuestions().size();
         double percentage = (double) correctAnswers / totalQuestions * 100;
         
-        // Create result entity
         ExamResult result = new ExamResult();
         result.setStudent(student);
         result.setExam(exam);
@@ -143,7 +144,6 @@ public class ExamResultController {
         dto.setPercentage(result.getPercentage());
         dto.setCompletedAt(result.getCompletedAt());
         
-        // Get response details for question results
         List<StudentResponse> responses = responseRepository.findByStudentAndExam(result.getStudent(), result.getExam());
         List<QuestionResultDto> questionResults = responses.stream().map(response -> {
             QuestionResultDto qrDto = new QuestionResultDto();

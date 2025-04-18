@@ -25,29 +25,37 @@ const ViewResults = () => {
       try {
         setIsLoading(true);
         
+        // Get the logged-in professor's ID from localStorage
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        if (!user.id) {
+          throw new Error("Not authenticated");
+        }
+        
         // Fetch exam details
         const examData = await api.exams.getById(examId);
+        
+        // Check if the exam belongs to the logged-in professor
+        if (examData.professorId !== user.id) {
+          throw new Error("Unauthorized to view these results");
+        }
+        
         setExam(examData);
         
-        // For demo purposes, we'll use mock data since we don't have a full backend endpoint to fetch all results
-        // In a real implementation, you would fetch all results for this exam from the backend
-        
-        // Check if there are any saved results in localStorage
-        const storedResult = localStorage.getItem(`examResult_${examId}`);
-        if (storedResult) {
-          setResults([JSON.parse(storedResult)]);
-        } else {
-          // No results found
-          setResults([]);
-        }
+        // Fetch results for this exam and professor
+        const resultsData = await api.results.getByExamAndProfessor(examId, user.id);
+        setResults(resultsData);
         
         setError(null);
       } catch (err) {
         console.error("Error fetching exam results:", err);
-        setError("Failed to load exam results. Please try again later.");
+        let errorMessage = "Failed to load exam results. Please try again later.";
+        if (err.message === "Unauthorized to view these results") {
+          errorMessage = "You are not authorized to view these results.";
+        }
+        setError(errorMessage);
         toast({
           title: "Error",
-          description: "Failed to load exam results",
+          description: errorMessage,
           variant: "destructive",
         });
       } finally {

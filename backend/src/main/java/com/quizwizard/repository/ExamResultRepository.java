@@ -7,9 +7,11 @@ import com.quizwizard.model.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface ExamResultRepository extends JpaRepository<ExamResult, Long> {
     Optional<ExamResult> findByStudentAndExam(Student student, Exam exam);
+    List<ExamResult> findByExam(Exam exam);
 }

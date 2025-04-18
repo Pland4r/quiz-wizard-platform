@@ -1,23 +1,20 @@
-
 package com.quizwizard.controller;
 
 import com.quizwizard.dto.CalculateResultRequest;
 import com.quizwizard.dto.ExamResultDto;
-import com.quizwizard.dto.QuestionResultDto;
 import com.quizwizard.model.Exam;
 import com.quizwizard.model.ExamResult;
 import com.quizwizard.model.Student;
-import com.quizwizard.model.StudentResponse;
+import com.quizwizard.model.Professor;
 import com.quizwizard.repository.ExamRepository;
 import com.quizwizard.repository.ExamResultRepository;
 import com.quizwizard.repository.StudentRepository;
-import com.quizwizard.repository.StudentResponseRepository;
+import com.quizwizard.repository.ProfessorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,8 +34,36 @@ public class ExamResultController {
     private ExamRepository examRepository;
     
     @Autowired
-    private StudentResponseRepository responseRepository;
+    private ProfessorRepository professorRepository;
 
+    @GetMapping("/exam/{examId}/professor/{professorId}")
+    public ResponseEntity<List<ExamResultDto>> getResultsByExamAndProfessor(
+            @PathVariable Long examId,
+            @PathVariable Long professorId) {
+            
+        Optional<Professor> professorOpt = professorRepository.findById(professorId);
+        Optional<Exam> examOpt = examRepository.findById(examId);
+        
+        if (professorOpt.isEmpty() || examOpt.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        
+        Professor professor = professorOpt.get();
+        Exam exam = examOpt.get();
+        
+        // Check if the exam belongs to the professor
+        if (!exam.getProfessor().getId().equals(professor.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        
+        List<ExamResult> results = resultRepository.findByExam(exam);
+        List<ExamResultDto> resultDtos = results.stream()
+            .map(this::convertToDto)
+            .collect(Collectors.toList());
+        
+        return ResponseEntity.ok(resultDtos);
+    }
+    
     @PostMapping("/calculate")
     public ResponseEntity<ExamResultDto> calculateResults(@RequestBody CalculateResultRequest request) {
         Optional<Student> studentOpt = studentRepository.findById(request.getStudentId());

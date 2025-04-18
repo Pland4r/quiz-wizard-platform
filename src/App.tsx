@@ -10,6 +10,7 @@ import ProfessorDashboard from "./pages/ProfessorDashboard";
 import ExamCreation from "./pages/ExamCreation";
 import ExamTaking from "./pages/ExamTaking";
 import ExamResults from "./pages/ExamResults";
+import ViewResults from "./pages/ViewResults";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/edit-exam/:examId" element={<ExamCreation />} />
           <Route path="/exam/:examId" element={<ExamTaking />} />
           <Route path="/exam-results/:examId" element={<ExamResults />} />
+          <Route path="/view-results/:examId" element={<ViewResults />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

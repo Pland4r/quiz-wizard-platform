@@ -8,6 +8,7 @@ import com.quizwizard.model.Professor;
 import com.quizwizard.model.Question;
 import com.quizwizard.repository.ExamRepository;
 import com.quizwizard.repository.ProfessorRepository;
+import com.quizwizard.repository.QuestionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,9 @@ public class ExamController {
 
     @Autowired
     private ProfessorRepository professorRepository;
+    
+    @Autowired
+    private QuestionRepository questionRepository;
 
     @GetMapping
     public ResponseEntity<List<ExamDto>> getAllExams(@RequestParam Long professorId) {
@@ -64,7 +68,14 @@ public class ExamController {
         }
         
         ExamDto examDto = convertToDto(examOpt.get());
-        // Hide correct answers when serving to students
+        
+        // Vérifier si l'examen a des questions
+        if (examDto.getQuestions() == null || examDto.getQuestions().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(null); // Retourner une erreur pour indiquer que l'examen n'a pas de questions
+        }
+        
+        // Cacher les réponses correctes lorsqu'on sert l'examen aux étudiants
         examDto.getQuestions().forEach(q -> q.setCorrectAnswer(null));
         
         return ResponseEntity.ok(examDto);
@@ -87,6 +98,24 @@ public class ExamController {
         
         Exam savedExam = examRepository.save(exam);
         
+        // Si des questions sont fournies, les créer également
+        if (examDto.getQuestions() != null && !examDto.getQuestions().isEmpty()) {
+            for (QuestionDto questionDto : examDto.getQuestions()) {
+                Question question = new Question();
+                question.setText(questionDto.getText());
+                question.setType(questionDto.getType());
+                question.setOptions(questionDto.getOptions());
+                question.setCorrectAnswer(questionDto.getCorrectAnswer());
+                question.setDurationSeconds(questionDto.getDurationSeconds());
+                question.setExam(savedExam);
+                
+                questionRepository.save(question);
+            }
+            
+            // Recharger l'examen pour récupérer les questions sauvegardées
+            savedExam = examRepository.findById(savedExam.getId()).orElse(savedExam);
+        }
+        
         return ResponseEntity.status(HttpStatus.CREATED).body(convertToDto(savedExam));
     }
 
@@ -101,6 +130,29 @@ public class ExamController {
         Exam exam = examOpt.get();
         exam.setName(examDto.getName());
         exam.setDescription(examDto.getDescription());
+        
+        // Mettre à jour les questions existantes et en ajouter de nouvelles si nécessaire
+        if (examDto.getQuestions() != null) {
+            // Supprimer les questions existantes
+            List<Question> existingQuestions = questionRepository.findByExam(exam);
+            questionRepository.deleteAll(existingQuestions);
+            
+            // Ajouter les nouvelles questions
+            List<Question> newQuestions = new ArrayList<>();
+            for (QuestionDto questionDto : examDto.getQuestions()) {
+                Question question = new Question();
+                question.setText(questionDto.getText());
+                question.setType(questionDto.getType());
+                question.setOptions(questionDto.getOptions());
+                question.setCorrectAnswer(questionDto.getCorrectAnswer());
+                question.setDurationSeconds(questionDto.getDurationSeconds());
+                question.setExam(exam);
+                
+                newQuestions.add(question);
+            }
+            
+            questionRepository.saveAll(newQuestions);
+        }
         
         Exam updatedExam = examRepository.save(exam);
         

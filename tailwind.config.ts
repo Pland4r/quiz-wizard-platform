@@ -53,22 +53,12 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
-					foreground: 'hsl(var(--sidebar-foreground))',
-					primary: 'hsl(var(--sidebar-primary))',
-					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-					accent: 'hsl(var(--sidebar-accent))',
-					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
-				},
 				quiz: {
-					primary: '#0A3D62',
-					secondary: '#3498DB',
-					accent: '#F39C12',
-					light: '#F8F9FA',
-					dark: '#2C3E50'
+					primary: '#4F46E5', // Changed to indigo
+					secondary: '#06B6D4', // Changed to cyan
+					accent: '#F59E0B', // Amber
+					light: '#F9FAFB',
+					dark: '#1F2937'
 				}
 			},
 			borderRadius: {

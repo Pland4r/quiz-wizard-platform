@@ -7,5 +7,6 @@ import lombok.Data;
 public class StudentDto {
     private Long id;
     private String email;
+    private String name;
     private String role;
 }

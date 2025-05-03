@@ -105,11 +105,18 @@ const Index = () => {
                 <div className="absolute -z-10 bottom-1/4 right-1/4 w-1/2 h-1/2 bg-quiz-secondary/20 rounded-full blur-3xl"></div>
                 
                 <div className="relative">
-                  <img
-                    src="https://images.unsplash.com/photo-1488190528505-98d2b5aba04b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
-                    alt="Student taking an online exam"
-                    className="w-full rounded-3xl shadow-2xl object-cover aspect-[4/3]"
-                  />
+                  {/* Improved image display with loading optimization */}
+                  <div className="w-full rounded-3xl shadow-2xl overflow-hidden bg-gray-100">
+                    <img
+                      src="https://images.unsplash.com/photo-1488190528505-98d2b5aba04b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80"
+                      alt="Student taking an online exam"
+                      className="w-full object-cover aspect-[4/3] transition-opacity duration-300"
+                      loading="eager"
+                      onLoad={(e) => (e.target as HTMLImageElement).classList.add('opacity-100')}
+                      style={{ opacity: 0.9 }}
+                    />
+                  </div>
+                  
                   <div className="absolute -bottom-6 -left-6 rounded-2xl bg-white p-4 shadow-xl border border-gray-100 rotate-3 hover:rotate-0 transition-transform duration-300">
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 bg-green-100 rounded-full flex items-center justify-center text-green-600">

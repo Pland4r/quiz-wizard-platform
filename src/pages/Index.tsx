@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { 
@@ -23,6 +23,7 @@ import {
 
 const Index = () => {
   const [examCode, setExamCode] = useState("");
+  const [imageLoaded, setImageLoaded] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -106,17 +107,24 @@ const Index = () => {
                 <div className="absolute -z-10 bottom-1/4 right-1/4 w-1/2 h-1/2 bg-quiz-secondary/20 rounded-full blur-3xl"></div>
                 
                 <div className="relative">
-                  {/* Fixed image implementation */}
-                  <div className="w-full rounded-3xl shadow-2xl overflow-hidden bg-white border border-gray-200">
-                    <div className="w-full h-full aspect-[4/3] bg-gray-100 relative">
-                      <img
-                        src="https://images.unsplash.com/photo-1488190528505-98d2b5aba04b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&h=900&q=80"
-                        alt="Student taking an online exam"
-                        className="w-full h-full object-cover"
-                        loading="eager"
-                        decoding="async"
-                      />
-                    </div>
+                  {/* Updated image implementation */}
+                  <div className="w-full h-[320px] md:h-[380px] rounded-3xl shadow-2xl overflow-hidden bg-gray-100 border border-gray-200">
+                    {!imageLoaded && (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-100 animate-pulse">
+                        <BookOpen className="h-16 w-16 text-gray-300" />
+                      </div>
+                    )}
+                    <img
+                      src="https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&h=900&q=80"
+                      alt="Student taking an online exam"
+                      className={`w-full h-full object-cover transition-opacity duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                      loading="eager"
+                      onLoad={() => setImageLoaded(true)}
+                      onError={(e) => {
+                        console.error("Image failed to load");
+                        (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=900&q=80";
+                      }}
+                    />
                   </div>
                   
                   <div className="absolute -bottom-6 -left-6 rounded-2xl bg-white p-4 shadow-xl border border-gray-100 rotate-3 hover:rotate-0 transition-transform duration-300">

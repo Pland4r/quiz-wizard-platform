@@ -1,8 +1,8 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, BookOpen, ChevronDown } from "lucide-react";
 import { User } from "@/types";
 
 interface NavbarProps {
@@ -12,7 +12,23 @@ interface NavbarProps {
 
 export const Navbar = ({ user, onLogout }: NavbarProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 10) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -27,14 +43,14 @@ export const Navbar = ({ user, onLogout }: NavbarProps) => {
   };
 
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-50">
+    <header className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white/80 backdrop-blur-lg shadow-md' : 'bg-transparent'}`}>
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-quiz-primary to-quiz-secondary flex items-center justify-center">
-              <span className="text-white font-bold text-lg">Q</span>
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-quiz-primary to-quiz-secondary flex items-center justify-center">
+              <BookOpen className="h-5 w-5 text-white" />
             </div>
-            <span className="font-bold text-xl">Quiz Wizard</span>
+            <span className="font-heading font-bold text-xl">Quiz Wizard</span>
           </Link>
           
           {/* Desktop Navigation */}
@@ -61,8 +77,8 @@ export const Navbar = ({ user, onLogout }: NavbarProps) => {
                 </Link>
               </>
             )}
-            <a href="#about" className="font-medium text-gray-600 hover:text-quiz-primary transition-colors">
-              About
+            <a href="#about" className="font-medium text-gray-600 hover:text-quiz-primary transition-colors flex items-center gap-1">
+              About <ChevronDown className="h-4 w-4" />
             </a>
             <a href="#contact" className="font-medium text-gray-600 hover:text-quiz-primary transition-colors">
               Contact
@@ -79,21 +95,21 @@ export const Navbar = ({ user, onLogout }: NavbarProps) => {
                 <Button 
                   variant="outline"
                   onClick={onLogout}
-                  className="border-gray-300 text-gray-700 hover:bg-gray-100"
+                  className="border-gray-300 text-gray-700 hover:bg-gray-100 rounded-xl"
                 >
                   Logout
                 </Button>
               </div>
             ) : (
               <Link to="/login">
-                <Button className="bg-quiz-primary hover:bg-quiz-primary/90">Login</Button>
+                <Button className="bg-quiz-primary hover:bg-quiz-primary/90 rounded-xl">Login</Button>
               </Link>
             )}
           </div>
           
           {/* Mobile menu button */}
           <div className="md:hidden">
-            <Button variant="ghost" size="icon" onClick={toggleMenu}>
+            <Button variant="ghost" size="icon" onClick={toggleMenu} className="text-gray-700">
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
           </div>
@@ -102,7 +118,7 @@ export const Navbar = ({ user, onLogout }: NavbarProps) => {
       
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white border-t">
+        <div className="md:hidden bg-white/95 backdrop-blur-lg border-t border-gray-100 animate-fade-in">
           <div className="container mx-auto px-4 py-3 space-y-2">
             <Link 
               to="/" 
@@ -145,7 +161,7 @@ export const Navbar = ({ user, onLogout }: NavbarProps) => {
             </a>
             
             {user ? (
-              <div className="pt-2 border-t">
+              <div className="pt-2 border-t border-gray-100">
                 <div className="px-3 py-2 text-sm text-gray-600">
                   Signed in as <span className="font-medium">{user.email}</span>
                 </div>
@@ -155,15 +171,15 @@ export const Navbar = ({ user, onLogout }: NavbarProps) => {
                     closeMenu();
                     onLogout && onLogout();
                   }}
-                  className="ml-3 border-gray-300 text-gray-700 hover:bg-gray-100"
+                  className="ml-3 border-gray-300 text-gray-700 hover:bg-gray-100 rounded-xl"
                 >
                   Logout
                 </Button>
               </div>
             ) : (
-              <div className="pt-2 border-t">
+              <div className="pt-2 border-t border-gray-100">
                 <Link to="/login" onClick={closeMenu}>
-                  <Button className="ml-3 bg-quiz-primary hover:bg-quiz-primary/90">Login</Button>
+                  <Button className="ml-3 bg-quiz-primary hover:bg-quiz-primary/90 rounded-xl">Login</Button>
                 </Link>
               </div>
             )}
